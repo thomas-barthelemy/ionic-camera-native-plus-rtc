@@ -1,0 +1,46 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+    <script src="js/ng-cordova.min.js"></script>
+    <script src="cordova.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body ng-app="starter">
+    <ion-header-bar class="bar-assertive">
+        <h1 class="title"></h1>
+    </ion-header-bar>
+    <ion-content ng-controller="ExampleController" padding="true">
+        <button class="button button-full button-assertive"
+                ng-click="captureVideoNative()"
+                ng-if="bestCaptureMode === 'native'"
+        >
+            Record Video (Native)
+        </button>
+        <input type="file"
+               accept="video/*;capture=camcorder"
+               capture="camcorder"
+               ng-if="bestCaptureMode === 'mediaAPI'"
+        >
+        <input type="file"
+               accept="video/*"
+               ng-if="bestCaptureMode === 'input'"
+        >
+        <div ng-if="bestCaptureMode === 'webRTC'">
+
+            <button ng-click="captureVideoWebRTC()">
+                Record
+            </button>
+        </div>
+        <p style="margin-top: 50px;">Result</p>
+        <video id="videoResult"
+               controls="controls"
+               style="max-width: 90%;"
+        >
+        </video>
+    </ion-content>
+</body>
