@@ -32,8 +32,15 @@
         >
         <div ng-if="bestCaptureMode === 'webRTC'">
 
-            <button ng-click="captureVideoWebRTC()">
+            <button ng-click="captureVideoWebRTC()"
+                    ng-if="!pageState.isRecording"
+            >
                 Record
+            </button>
+            <button ng-click="stopCaptureVideoWebRTC()"
+                    ng-if="pageState.isRecording"
+            >
+                Stop Recording
             </button>
         </div>
         <p style="margin-top: 50px;">Result</p>
