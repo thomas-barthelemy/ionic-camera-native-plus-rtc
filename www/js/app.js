@@ -10,7 +10,7 @@ angular.module(
     $scope.captureVideoWebRTC = captureVideoWebRTC;
     $scope.stopCaptureVideoWebRTC = stopCaptureVideoWebRTC;
 
-    $scope.captureVideoNative = function() {
+    $scope.captureVideoNative = function () {
         captureVideoNative($scope, $cordovaCapture);
     };
 
@@ -21,7 +21,7 @@ var pageState = {
     stream: undefined
 };
 
-var captureVideoNative = function($scope, $cordovaCapture) {
+var captureVideoNative = function ($scope, $cordovaCapture) {
     var options = {
         limit: 1,
         duration: 15
@@ -40,20 +40,20 @@ var captureVideoNative = function($scope, $cordovaCapture) {
 
 var stopCaptureVideoWebRTC = function () {
     pageState.isRecording = false;
-    if(pageState.stream) {
+    if (pageState.stream) {
         // This will be deprecated eventually
         // but the alternative may cause crashes on some browser so far
-        if(pageState.stream.stop) {
+        if (pageState.stream.stop) {
             pageState.stream.stop();
         } else {
-            pageState.stream.getTracks().forEach(function(track) {
+            pageState.stream.getTracks().forEach(function (track) {
                 track.stop();
             })
         }
     }
 };
 
-var captureVideoWebRTC = function() {
+var captureVideoWebRTC = function () {
     pageState.isRecording = true;
     window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
     navigator.getUserMedia = navigator.getUserMedia ||
@@ -64,14 +64,14 @@ var captureVideoWebRTC = function() {
 
     navigator.getUserMedia(
         {video: true},
-        function(stream) {
+        function (stream) {
             pageState.stream = stream;
             // TODO: This is just streaming to the video tag, so have to actually
             // use the MediaCapture API to record to a blob and update the video src
             // when completed.
 
             var video = document.getElementById('videoResult');
-            if(video.mozSrcObject !== undefined) {
+            if (video.mozSrcObject !== undefined) {
                 // Firefox
                 video.mozSrcObject = stream;
             } else {
@@ -89,27 +89,27 @@ var captureVideoWebRTC = function() {
 
 };
 
-var isVideoSupportsStreamCapturing = function() {
+var isVideoSupportsStreamCapturing = function () {
     var videoDom = document.createElement('video');
     return 'captureStream' in videoDom ||
         'mozCaptureStream' in videoDom ||
         'webkitCaptureStream' in videoDom
-    ;
+        ;
 
 };
 
 var getBestCaptureMode = function () {
-    if(ionic.Platform.isWebView()) {
+    if (ionic.Platform.isWebView()) {
         // Native is available
         return 'native';
     }
-    if(isVideoSupportsStreamCapturing()) {
+    if (isVideoSupportsStreamCapturing()) {
         // WebRTC Stream Capture is available
         return 'webRTC';
     }
-    if(
+    if (
         ionic.Platform.isAndroid() &&
-            ionic.Platform.version() >= 3
+        ionic.Platform.version() >= 3
     ) {
         // Media Capture API should be supported
         return 'mediaAPI';
