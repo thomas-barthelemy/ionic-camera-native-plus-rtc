@@ -18,7 +18,9 @@ angular.module(
 
 var pageState = {
     isRecording: false,
-    stream: undefined
+    stream: undefined,
+    recorder: undefined,
+    chunks: undefined
 };
 
 var captureVideoNative = function ($scope, $cordovaCapture) {
@@ -40,6 +42,22 @@ var captureVideoNative = function ($scope, $cordovaCapture) {
 
 var stopCaptureVideoWebRTC = function () {
     pageState.isRecording = false;
+
+    if (pageState.recorder && pageState.chunks) {
+        pageState.recorder.onstop = function () {
+            var blob = new Blob(pageState.chunks, { type: 'video/mp4'});
+
+            pageState.chunks = [];
+
+            var video = document.getElementById('videoResult');
+            if(video.mozSrcObject !== undefined) {
+                video.mozSrcObject = undefined;
+            }
+            video.src = window.URL.createObjectURL(blob);
+        };
+        pageState.recorder.stop();
+    }
+
     if (pageState.stream) {
         // This will be deprecated eventually
         // but the alternative may cause crashes on some browser so far
@@ -66,14 +84,15 @@ var captureVideoWebRTC = function () {
         {video: true},
         function (stream) {
             pageState.stream = stream;
-            // TODO: This is just streaming to the video tag, so have to actually
-            // use the MediaCapture API to record to a blob and update the video src
-            // when completed.
 
             var video = document.getElementById('videoResult');
             if (video.mozSrcObject !== undefined) {
                 // Firefox
                 video.mozSrcObject = stream;
+                pageState.chunks = [];
+                pageState.recorder = new MediaRecorder(stream, {mimeType: 'video/mp4'});
+                pageState.recorder.ondataavailable = handleDataAvailable;
+                pageState.recorder.start();
             } else {
                 // Chrome
                 video.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
@@ -118,3 +137,9 @@ var getBestCaptureMode = function () {
     // Nothing known is supported
     return 'input'
 };
+
+function handleDataAvailable(event) {
+    if (event.data && event.data.size > 0) {
+        pageState.chunks.push(event.data);
+    }
+}
